@@ -1233,6 +1233,7 @@ class Graph(Node):
         format: str,
         base: Optional[str],
         encoding: str,
+        sort: bool = ...,
         **args: Any,
     ) -> bytes:
         ...
@@ -1246,6 +1247,7 @@ class Graph(Node):
         base: Optional[str] = ...,
         *,
         encoding: str,
+        sort: bool = ...,
         **args: Any,
     ) -> bytes:
         ...
@@ -1258,6 +1260,7 @@ class Graph(Node):
         format: str = ...,
         base: Optional[str] = ...,
         encoding: None = ...,
+        sort: bool = ...,
         **args: Any,
     ) -> str:
         ...
@@ -1270,6 +1273,7 @@ class Graph(Node):
         format: str = ...,
         base: Optional[str] = ...,
         encoding: Optional[str] = ...,
+        sort: bool = ...,
         **args: Any,
     ) -> "Graph":
         ...
@@ -1282,6 +1286,7 @@ class Graph(Node):
         format: str = ...,
         base: Optional[str] = ...,
         encoding: Optional[str] = ...,
+        sort: bool = ...,
         **args: Any,
     ) -> Union[bytes, str, "Graph"]:
         ...
@@ -1292,6 +1297,7 @@ class Graph(Node):
         format: str = "turtle",
         base: Optional[str] = None,
         encoding: Optional[str] = None,
+        sort: bool = ...,
         **args: Any,
     ) -> Union[bytes, str, _GraphT]:
         """
@@ -1335,14 +1341,20 @@ class Graph(Node):
         if destination is None:
             stream = BytesIO()
             if encoding is None:
-                serializer.serialize(stream, base=base, encoding="utf-8", **args)
+                serializer.serialize(
+                    stream, base=base, encoding="utf-8", sort=sort, **args
+                )
                 return stream.getvalue().decode("utf-8")
             else:
-                serializer.serialize(stream, base=base, encoding=encoding, **args)
+                serializer.serialize(
+                    stream, base=base, encoding=encoding, sort=sort, **args
+                )
                 return stream.getvalue()
         if hasattr(destination, "write"):
             stream = cast(IO[bytes], destination)
-            serializer.serialize(stream, base=base, encoding=encoding, **args)
+            serializer.serialize(
+                stream, base=base, encoding=encoding, sort=sort, **args
+            )
         else:
             if isinstance(destination, pathlib.PurePath):
                 os_path = str(destination)
@@ -1358,7 +1370,7 @@ class Graph(Node):
                 else:
                     os_path = location
             with open(os_path, "wb") as stream:
-                serializer.serialize(stream, encoding=encoding, **args)
+                serializer.serialize(stream, encoding=encoding, sort=sort, **args)
         return self
 
     def print(
